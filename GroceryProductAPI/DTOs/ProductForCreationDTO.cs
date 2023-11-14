@@ -1,12 +1,12 @@
 ﻿namespace GroceryProductAPI.DTOs
 {
-    public class ProductDTO
+    public class ProductForCreationDTO
     {
         public string Upc { get; set; } = null!;
 
         public string Name { get; set; } = null!;
 
-        public string Category { get; set; } = null!;
+        public int CategoryId { get; set; }
 
         public string Brand { get; set; } = null!;
 
@@ -21,6 +21,6 @@
         public string Unit { get; set; } = null!;
 
         public int Quantity { get; set; }
-        public List<string> Ingredients {  get; set; } = null!;
+        public List<string> Ingredients { get; set; } = null!;
     }
 }

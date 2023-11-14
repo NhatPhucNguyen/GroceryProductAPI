@@ -1,4 +1,5 @@
-﻿using GroceryProductAPI.Models;
+﻿using GroceryProductAPI.DTOs;
+using GroceryProductAPI.Models;
 
 namespace GroceryProductAPI.Services
 {
@@ -8,5 +9,11 @@ namespace GroceryProductAPI.Services
 
         Task<IEnumerable<Product>> GetProductsAsync();
         Task<Product> GetProductByUPCAsync(string upc);
+
+        Task AddProductAsync(Product product);
+
+        Task<bool> DeleteProductAsync(string upc);
+
+        Task<bool> SaveAsync();
     }
 }
