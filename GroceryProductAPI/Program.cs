@@ -1,4 +1,5 @@
 using GroceryProductAPI.Models;
+using GroceryProductAPI.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,10 @@ var connectionString = new SqlConnectionStringBuilder(builder.Configuration.GetC
 builder.Services.AddDbContext<GroceryProductContext>(opt => opt.UseSqlServer(connectionString.ConnectionString));
 
 //AutoMapper configuration
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+//AddScope
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 

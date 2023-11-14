@@ -1,4 +1,7 @@
-﻿using GroceryProductAPI.Models;
+﻿using AutoMapper;
+using GroceryProductAPI.DTOs;
+using GroceryProductAPI.Models;
+using GroceryProductAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,22 +12,21 @@ namespace GroceryProductAPI.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly GroceryProductContext _context;
-        public ProductsController(GroceryProductContext context)
+        private readonly IProductRepository _repository;
+        private readonly IMapper _mapper;
+        public ProductsController(IProductRepository repository, IMapper mapper)
         {
-            _context = context;
+            _repository = repository;
+            _mapper = mapper;
         }
 
         [Route("/api/products")]
         [HttpGet]        
-        public async Task<ActionResult<ICollection<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            if(_context.Products == null)
-            {
-                return NotFound();
-            }
-            var products = await _context.Products.ToListAsync();
-            return Ok(products);
+            var products = await _repository.GetProductsAsync();
+            var results = _mapper.Map<IEnumerable<ProductDTO>>(products);
+            return Ok(results);
         }
     }
 }
