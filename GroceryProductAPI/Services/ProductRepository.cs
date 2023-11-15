@@ -51,5 +51,14 @@ namespace GroceryProductAPI.Services
         {
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task UpdateProductAsync(Product product)
+        {
+            var productToUpdate = await _context.Products.SingleAsync(p => p.Upc == product.Upc);
+            if(productToUpdate != null)
+            {
+                _context.Products.Entry(productToUpdate).CurrentValues.SetValues(product);
+            }
+        }
     }
 }

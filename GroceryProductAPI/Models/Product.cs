@@ -1,5 +1,7 @@
-﻿using System;
+﻿using AutoMapper.Configuration.Annotations;
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace GroceryProductAPI.Models;
 
@@ -28,8 +30,10 @@ public partial class Product
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
-
+    [Ignore]
+    [JsonIgnore]
     public virtual Category Category { get; set; } = null!;
-
+    [Ignore]
+    [JsonIgnore]
     public virtual ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
 }

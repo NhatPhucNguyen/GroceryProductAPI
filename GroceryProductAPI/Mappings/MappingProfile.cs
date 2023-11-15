@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GroceryProductAPI.DTOs;
 using GroceryProductAPI.Models;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace GroceryProductAPI.Mappings
 {
@@ -11,7 +12,9 @@ namespace GroceryProductAPI.Mappings
                 ForMember(dest => dest.Ingredients, 
                 opt => opt.MapFrom(p => p.Ingredients.Select(i => i.Name).ToList()))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(p => p.Category.Name));
-            CreateMap<ProductForCreationDTO, Product>().ForMember(dest => dest.Category,opt => opt.Ignore()).ForMember(dest => dest.Ingredients, opt => opt.Ignore());
+            CreateMap<ProductForCreationDTO, Product>();
+            CreateMap<ProductForUpdateDTO, Product>();
+            CreateMap<Product, ProductForUpdateDTO>();
         }
     }
 }

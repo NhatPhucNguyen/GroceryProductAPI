@@ -12,6 +12,8 @@ namespace GroceryProductAPI.Services
 
         Task AddProductAsync(Product product);
 
+        Task UpdateProductAsync(Product product);
+
         Task<bool> DeleteProductAsync(string upc);
 
         Task<bool> SaveAsync();
