@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
+using Azure;
 using GroceryProductAPI.DTOs;
 using GroceryProductAPI.Models;
 using GroceryProductAPI.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
 namespace GroceryProductAPI.Controllers
 {
+    [Route("/api/products")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
@@ -20,66 +23,142 @@ namespace GroceryProductAPI.Controllers
             _mapper = mapper;
         }
 
-        [Route("/api/products")]
         [HttpGet]        
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            var products = await _repository.GetProductsAsync();
-            var results = _mapper.Map<IEnumerable<ProductDTO>>(products);
-            return Ok(results);
-        }
-        [Route("/api/products")]
-        [HttpPost]
-        public async Task<ActionResult> AddProducts([FromBody] ProductForCreationDTO newProduct)
-        {
-            if(await _repository.ProductExistAsync(newProduct.Upc))
+            try
             {
-                return StatusCode(409, $"Product with UPC {newProduct.Upc} already existed");
+                var products = await _repository.GetProductsAsync();
+                var results = _mapper.Map<IEnumerable<ProductDTO>>(products);
+                return Ok(results);
             }
-            var productToAdd = _mapper.Map<Product>(newProduct);
-            foreach (var item in newProduct.Ingredients)
+            catch (Exception)
             {
-                Ingredient ingredient = new Ingredient() { Name = item };
-                productToAdd.Ingredients.Add(ingredient);
+                return StatusCode(500, "Something went wrong in the server");
             }
-            productToAdd.CategoryId = newProduct.CategoryId;
-            await _repository.AddProductAsync(_mapper.Map<Product>(productToAdd));
-
-            if(!await _repository.SaveAsync())
-            {
-                return BadRequest("Some thing went wrong with server");
-            }
-            return StatusCode(201,"Product is successfully created");
+            
         }
 
-        [Route("/api/products/{upc}")]
+        [Route("{upc}")]
         [HttpGet]
         public async Task<ActionResult<ProductDTO>> GetProductByUPCAsync(string upc)
         {
-            var product = await _repository.GetProductByUPCAsync(upc);
-
-            if (product == null)
+            try
             {
-                return NotFound($"Product with UPC {upc} not found.");
-            }
+                var product = await _repository.GetProductByUPCAsync(upc);
 
-            var result = _mapper.Map<ProductDTO>(product);
-            return Ok(result);
+                if (product == null)
+                {
+                    return NotFound($"Product with UPC {upc} not found.");
+                }
+
+                var result = _mapper.Map<ProductDTO>(product);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Something went wrong in the server");
+            }
+            
         }
-        [Route("/api/products/{upc}")]
+
+        [HttpPost]
+        public async Task<ActionResult> AddProducts([FromBody] ProductForCreationDTO newProduct)
+        {
+            try
+            {
+                if (await _repository.ProductExistAsync(newProduct.Upc))
+                {
+                    return StatusCode(409, $"Product with UPC {newProduct.Upc} already existed");
+                }
+                var productToAdd = _mapper.Map<Product>(newProduct);
+                foreach (var item in newProduct.IngredientsList)
+                {
+                    Ingredient ingredient = new Ingredient() { Name = item };
+                    productToAdd.Ingredients.Add(ingredient);
+                }
+                productToAdd.CategoryId = newProduct.CategoryId;
+                await _repository.AddProductAsync(_mapper.Map<Product>(productToAdd));
+                await _repository.SaveAsync();
+                return StatusCode(201, "Product is sucessfully created");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Something went wrong in the server");
+            }
+            
+            
+        }
+        [Route("{upc}")]
+        [HttpPut]
+        public async Task<ActionResult> UpdateProduct(string upc, [FromBody] ProductForUpdateDTO updatedProduct)
+        {
+            try
+            {
+                if (!await _repository.ProductExistAsync(upc))
+                {
+                    return NotFound($"Product with UPC {upc} not found.");
+                }
+                var productToUpdate = _mapper.Map<Product>(updatedProduct);
+                await _repository.UpdateProductAsync(productToUpdate);
+                await _repository.SaveAsync();
+                return Ok("Product is updated successfully");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Something went wrong in the server");
+            }
+            
+        }
+        [Route("{upc}")]
+        [HttpPatch]
+        public async Task<ActionResult> UpdatePrice(string upc,[FromBody] JsonPatchDocument<ProductForUpdateDTO> patchProduct)
+        {
+            try
+            {
+                if (!await _repository.ProductExistAsync(upc))
+                {
+                    return NotFound($"Product with UPC {upc} not found.");
+                }
+                var productFound = await _repository.GetProductByUPCAsync(upc);
+                var productToPatch = _mapper.Map<ProductForUpdateDTO>(productFound);
+                patchProduct.ApplyTo(productToPatch, ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                if (!TryValidateModel(productToPatch))
+                {
+                    return BadRequest(ModelState);
+                }
+                _mapper.Map(productToPatch, productFound);
+                await _repository.SaveAsync();
+                return Ok("Product is updated successfully");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Something went wrong in the server");
+            }
+            
+        }
+        [Route("{upc}")]
         [HttpDelete]
         public async Task<ActionResult> DeleteProductAsync(string upc)
         {
-            if(!await _repository.ProductExistAsync(upc))
+            try
             {
-                return NotFound($"Product with UPC {upc} not found");
+                if (!await _repository.ProductExistAsync(upc))
+                {
+                    return NotFound($"Product with UPC {upc} not found");
+                }
+                await _repository.DeleteProductAsync(upc);
+                return Ok("Product is successfully deleted");
             }
-            var isDeleted = await _repository.DeleteProductAsync(upc);
-            if (!isDeleted)
+            catch (Exception)
             {
-                return BadRequest("Something went wrong with server");
+                return StatusCode(500, "Something went wrong in the server");
             }
-            return Ok("Product is successfully deleted");
+            
         }
     }
 }

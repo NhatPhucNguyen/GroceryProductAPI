@@ -1,13 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Numerics;
-
-namespace GroceryProductAPI.DTOs
+﻿namespace GroceryProductAPI.DTOs
 {
-    public class ProductForCreationDTO
+    public class ProductForUpdateDTO
     {
-        public string Upc { get; set; } = null!;
-
         public string Name { get; set; } = null!;
+
         public int CategoryId { get; set; }
 
         public string Brand { get; set; } = null!;
@@ -23,6 +19,5 @@ namespace GroceryProductAPI.DTOs
         public string Unit { get; set; } = null!;
 
         public int Quantity { get; set; }
-        public List<string> IngredientsList { get; set; } = null!;
     }
 }
