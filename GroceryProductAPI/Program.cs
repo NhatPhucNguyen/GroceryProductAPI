@@ -12,6 +12,15 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//CORS configuration
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy(name: "AllowOrigin", builder =>
+    {
+        builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+    });
+});
+
 //Connect to databse
 var connectionString = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("Connection2RDS"));
 builder.Services.AddDbContext<GroceryProductContext>(opt => opt.UseSqlServer(connectionString.ConnectionString));
@@ -34,6 +43,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors("AllowOrigin");
 
 app.MapControllers();
 

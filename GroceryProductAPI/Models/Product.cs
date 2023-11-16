@@ -31,9 +31,7 @@ public partial class Product
 
     public DateTime? UpdatedAt { get; set; }
     [Ignore]
-    [JsonIgnore]
     public virtual Category Category { get; set; } = null!;
     [Ignore]
-    [JsonIgnore]
     public virtual ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
 }
