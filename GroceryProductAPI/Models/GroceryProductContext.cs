@@ -20,12 +20,12 @@ public partial class GroceryProductContext : DbContext
     public virtual DbSet<Ingredient> Ingredients { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
-   
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__23CAF1D8250A2480");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__23CAF1D89AA6E83D");
 
             entity.Property(e => e.CategoryId).HasColumnName("categoryId");
             entity.Property(e => e.CreatedAt)
@@ -47,7 +47,7 @@ public partial class GroceryProductContext : DbContext
 
         modelBuilder.Entity<Ingredient>(entity =>
         {
-            entity.HasKey(e => e.IngredientId).HasName("PK__Ingredie__2753A527FDB4AF4E");
+            entity.HasKey(e => e.IngredientId).HasName("PK__Ingredie__2753A527498AE616");
 
             entity.Property(e => e.IngredientId).HasColumnName("ingredientId");
             entity.Property(e => e.CreatedAt)
@@ -73,12 +73,11 @@ public partial class GroceryProductContext : DbContext
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasKey(e => e.Upc).HasName("PK__Products__DD77EB4232B34FD4");
+            entity.HasKey(e => e.Upc).HasName("PK__Products__DD77EB42344064A6");
 
             entity.Property(e => e.Upc)
                 .HasMaxLength(13)
                 .IsUnicode(false)
-                .IsFixedLength()
                 .HasColumnName("upc");
             entity.Property(e => e.Brand)
                 .HasMaxLength(200)
@@ -100,11 +99,13 @@ public partial class GroceryProductContext : DbContext
                 .HasMaxLength(200)
                 .IsUnicode(false)
                 .HasColumnName("name");
-            entity.Property(e => e.NutrionInfo)
+            entity.Property(e => e.NutritionInfo)
                 .HasMaxLength(300)
                 .IsUnicode(false)
-                .HasColumnName("nutrionInfo");
-            entity.Property(e => e.Price).HasColumnName("price");
+                .HasColumnName("nutritionInfo");
+            entity.Property(e => e.Price)
+                .HasColumnType("smallmoney")
+                .HasColumnName("price");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
             entity.Property(e => e.Unit)
                 .HasMaxLength(50)
@@ -118,7 +119,7 @@ public partial class GroceryProductContext : DbContext
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Products__catego__0697FACD");
+                .HasConstraintName("FK__Products__catego__57A801BA");
 
             entity.HasMany(d => d.Ingredients).WithMany(p => p.Products)
                 .UsingEntity<Dictionary<string, object>>(
@@ -126,19 +127,18 @@ public partial class GroceryProductContext : DbContext
                     r => r.HasOne<Ingredient>().WithMany()
                         .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__ProductIn__ingre__0E391C95"),
+                        .HasConstraintName("FK__ProductIn__ingre__5F492382"),
                     l => l.HasOne<Product>().WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__ProductIn__produ__0D44F85C"),
+                        .HasConstraintName("FK__ProductIn__produ__5E54FF49"),
                     j =>
                     {
-                        j.HasKey("ProductId", "IngredientId").HasName("PK__ProductI__4F65EB3840666E26");
+                        j.HasKey("ProductId", "IngredientId").HasName("PK__ProductI__4F65EB381F412B87");
                         j.ToTable("ProductIngredients");
                         j.IndexerProperty<string>("ProductId")
                             .HasMaxLength(13)
                             .IsUnicode(false)
-                            .IsFixedLength()
                             .HasColumnName("productId");
                         j.IndexerProperty<int>("IngredientId").HasColumnName("ingredientId");
                     });

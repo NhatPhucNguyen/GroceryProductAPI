@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AutoMapper.Configuration.Annotations;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace GroceryProductAPI.Models;
@@ -16,6 +18,7 @@ public partial class Ingredient
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
-
+    [Ignore]
+    [JsonIgnore]
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

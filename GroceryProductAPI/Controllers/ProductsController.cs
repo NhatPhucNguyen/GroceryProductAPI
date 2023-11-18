@@ -85,8 +85,7 @@ namespace GroceryProductAPI.Controllers
             catch (Exception)
             {
                 return StatusCode(500, "Something went wrong in the server");
-            }
-            
+            }           
             
         }
         [Route("{upc}")]
@@ -100,13 +99,19 @@ namespace GroceryProductAPI.Controllers
                     return NotFound($"Product with UPC {upc} not found.");
                 }
                 var productToUpdate = _mapper.Map<Product>(updatedProduct);
+                productToUpdate.Upc = upc;
+                foreach (var item in updatedProduct.IngredientsList)
+                {
+                    Ingredient ingredient = new Ingredient() { Name = item };
+                    productToUpdate.Ingredients.Add(ingredient);
+                }
                 await _repository.UpdateProductAsync(productToUpdate);
                 await _repository.SaveAsync();
                 return Ok("Product is updated successfully");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return StatusCode(500, "Something went wrong in the server");
+                return StatusCode(500, e);
             }
             
         }

@@ -8,9 +8,9 @@
 
         public string Brand { get; set; } = null!;
 
-        public int Price { get; set; }
+        public decimal Price { get; set; }
 
-        public string NutrionInfo { get; set; } = null!;
+        public string NutritionInfo { get; set; } = null!;
 
         public string? Description { get; set; }
 
@@ -19,5 +19,6 @@
         public string Unit { get; set; } = null!;
 
         public int Quantity { get; set; }
+        public List<string> IngredientsList { get; set; } = null!;
     }
 }
