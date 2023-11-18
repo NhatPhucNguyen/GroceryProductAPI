@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Configuration.Annotations;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace GroceryProductAPI.Models;
 
@@ -15,9 +15,9 @@ public partial class Product
 
     public string Brand { get; set; } = null!;
 
-    public int Price { get; set; }
+    public decimal Price { get; set; }
 
-    public string NutrionInfo { get; set; } = null!;
+    public string NutritionInfo { get; set; } = null!;
 
     public string? Description { get; set; }
 
@@ -31,7 +31,9 @@ public partial class Product
 
     public DateTime? UpdatedAt { get; set; }
     [Ignore]
+    [JsonIgnore]
     public virtual Category Category { get; set; } = null!;
     [Ignore]
+    [JsonIgnore]
     public virtual ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
 }

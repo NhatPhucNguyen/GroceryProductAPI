@@ -27,7 +27,7 @@ namespace GroceryProductAPI.Services
         public async Task<IEnumerable<Product>> GetProductsAsync()
         {
             var results = await _context.Products.Include(p => p.Category).Include(p => p.Ingredients).ToListAsync();
-            return results.OrderBy(p => p.Name);
+            return results.OrderBy(p=>p.UpdatedAt).Reverse();
         }
 
         public async Task<bool> ProductExistAsync(string upc)
@@ -54,10 +54,17 @@ namespace GroceryProductAPI.Services
 
         public async Task UpdateProductAsync(Product product)
         {
-            var productToUpdate = await _context.Products.SingleAsync(p => p.Upc == product.Upc);
+            var productToUpdate = await _context.Products.Include(p => p.Ingredients).FirstOrDefaultAsync(p => p.Upc == product.Upc);
             if(productToUpdate != null)
             {
                 _context.Products.Entry(productToUpdate).CurrentValues.SetValues(product);
+                foreach (var item in product.Ingredients)
+                {
+                    if(item.Name != productToUpdate.Name)
+                    {
+                        productToUpdate.Ingredients.Add(item);
+                    }
+                }
             }
         }
     }

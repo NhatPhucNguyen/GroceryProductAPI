@@ -9,7 +9,7 @@ namespace GroceryProductAPI.Mappings
     {
         public MappingProfile() {
             CreateMap<Product, ProductDTO>().
-                ForMember(dest => dest.Ingredients, 
+                ForMember(dest => dest.IngredientsList, 
                 opt => opt.MapFrom(p => p.Ingredients.Select(i => i.Name).ToList()))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(p => p.Category.Name));
             CreateMap<ProductForCreationDTO, Product>();
