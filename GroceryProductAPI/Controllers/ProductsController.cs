@@ -63,7 +63,7 @@ namespace GroceryProductAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddProducts([FromBody] ProductForCreationDTO newProduct)
+        public async Task<ActionResult> AddProduct([FromBody] ProductForCreationDTO newProduct)
         {
             try
             {

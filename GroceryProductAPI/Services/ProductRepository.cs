@@ -55,8 +55,10 @@ namespace GroceryProductAPI.Services
         public async Task UpdateProductAsync(Product product)
         {
             var productToUpdate = await _context.Products.Include(p => p.Ingredients).FirstOrDefaultAsync(p => p.Upc == product.Upc);
+
             if(productToUpdate != null)
             {
+                product.CreatedAt = productToUpdate.CreatedAt;
                 _context.Products.Entry(productToUpdate).CurrentValues.SetValues(product);
                 foreach (var item in product.Ingredients)
                 {
@@ -65,6 +67,7 @@ namespace GroceryProductAPI.Services
                         productToUpdate.Ingredients.Add(item);
                     }
                 }
+                productToUpdate.UpdatedAt = DateTime.Now;
             }
         }
     }

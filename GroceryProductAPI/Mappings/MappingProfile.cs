@@ -19,6 +19,7 @@ namespace GroceryProductAPI.Mappings
 
             //Category mapping
             CreateMap<Category, CategoryDTO>();
+            CreateMap<CategoryForCreationDTO, Category>();
         }
     }
 }
