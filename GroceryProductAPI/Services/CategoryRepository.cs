@@ -12,9 +12,9 @@ namespace GroceryProductAPI.Services
             _context = context;
         }
 
-        public Task AddCategoryAsync(Category category)
+        public async Task AddCategoryAsync(Category category)
         {
-            throw new NotImplementedException();
+            await _context.Categories.AddAsync(category);
         }
 
         public async Task<bool> CategoryExistAsync(int id)
@@ -22,9 +22,21 @@ namespace GroceryProductAPI.Services
             return await _context.Categories.AnyAsync(c => c.CategoryId == id);
         }
 
-        public Task DeleteCategoryAsync(int id)
+        public async Task<bool> CategoryExistAsync(string name)
         {
-            throw new NotImplementedException();
+            return await _context.Categories.AnyAsync(c => c.Name == name);
+        }
+
+        public async Task DeleteCategoryAsync(int id)
+        {
+            var categoryToDelete = await _context.Categories
+                .Include(c => c.Products)
+                .FirstOrDefaultAsync(c => c.CategoryId == id);
+            if (categoryToDelete != null)
+            {
+                categoryToDelete.Products.Clear();
+                _context.Categories.Remove(categoryToDelete);
+            }
         }
 
         public async Task<IEnumerable<Category>> GetCategoriesAsync()
@@ -32,19 +44,33 @@ namespace GroceryProductAPI.Services
             return await _context.Categories.ToListAsync();
         }
 
-        public Task<Category> GetCategoryByIdAsync(int id)
+        public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == id) ?? throw new Exception("Product not found");
+            return category;
         }
 
-        public Task<Category> GetCategoryByNameAsync(string name)
+        public async Task<Category?> GetCategoryByNameAsync(string name)
         {
-            throw new NotImplementedException();
+            var categoryFound = await _context.Categories.FirstOrDefaultAsync(category => category.Name.Contains(name));
+            return categoryFound;
         }
 
-        public Task UpdateCategoryAsync(Category category)
+        public async Task<bool> SaveAsync()
         {
-            throw new NotImplementedException();
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task UpdateCategoryAsync(Category category)
+        {
+            var categoryToUpdate = await _context.Categories
+                .FirstOrDefaultAsync(c => c.CategoryId == category.CategoryId);            
+            if(categoryToUpdate != null)
+            {
+                category.CreatedAt = categoryToUpdate.CreatedAt;
+                _context.Categories.Entry(categoryToUpdate).CurrentValues.SetValues(category);
+                categoryToUpdate.UpdatedAt = DateTime.Now;
+            }
         }
     }
 }
