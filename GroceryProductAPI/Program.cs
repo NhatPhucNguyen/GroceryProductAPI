@@ -23,6 +23,10 @@ builder.Services.AddCors(opt =>
 
 //Connect to databse
 var connectionString = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("Connection2RDS"));
+var userId = builder.Configuration.GetSection("MySettings").GetSection("Username").Value;
+var password = builder.Configuration.GetSection("MySettings").GetSection("Password").Value;
+connectionString.UserID = userId;
+connectionString.Password = password;
 builder.Services.AddDbContext<GroceryProductContext>(opt => opt.UseSqlServer(connectionString.ConnectionString));
 
 //AutoMapper configuration

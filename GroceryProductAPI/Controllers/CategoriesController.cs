@@ -3,6 +3,7 @@ using GroceryProductAPI.DTOs;
 using GroceryProductAPI.Models;
 using GroceryProductAPI.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GroceryProductAPI.Controllers
@@ -64,6 +65,76 @@ namespace GroceryProductAPI.Controllers
                 await _repository.AddCategoryAsync(categoryToAdd);
                 await _repository.SaveAsync();
                 return Ok($"Category {category.Name} is added successfully");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
+        [Route("{id}")]
+        [HttpPut]
+        public async Task<ActionResult> UpdateCategory(int id,[FromBody] CategoryForUpdateDTO category)
+        {
+            try
+            {                
+                if(!await _repository.CategoryExistAsync(id))
+                {
+                    return NotFound($"Category with id {id} not found");
+                }
+                var categoryToUpdate = _mapper.Map<Category>(category);
+                categoryToUpdate.CategoryId = id;
+                await _repository.UpdateCategoryAsync(categoryToUpdate);
+                await _repository.SaveAsync();
+                return Ok("Category updated successfully");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
+        [Route("{id}")]
+        [HttpPatch]
+        public async Task<ActionResult> PatchCategory(int id, [FromBody] JsonPatchDocument<CategoryForUpdateDTO> patchCategory)
+        {
+            try
+            {
+                if (!await _repository.CategoryExistAsync(id))
+                {
+                    return NotFound($"Category with id {id} not found");
+                }
+                var categoryFound = await _repository.GetCategoryByIdAsync(id);
+                var categoryToPatch = _mapper.Map<CategoryForUpdateDTO>(categoryFound);
+                patchCategory.ApplyTo(categoryToPatch,ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                if (!TryValidateModel(categoryToPatch))
+                {
+                    return BadRequest(ModelState);
+                }
+                _mapper.Map(categoryToPatch, categoryFound);
+                await _repository.SaveAsync();
+                return Ok("Category updated successfully");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
+        [Route("{id}")]
+        [HttpDelete]
+        public async Task<ActionResult> DeleteCategory(int id)
+        {
+            try
+            {
+                if (!await _repository.CategoryExistAsync(id))
+                {
+                    return NotFound($"Category with id {id} not found");
+                }                
+                await _repository.DeleteCategoryAsync(id);
+                await _repository.SaveAsync();
+                return Ok("Category deleted successfully");
             }
             catch (Exception e)
             {
