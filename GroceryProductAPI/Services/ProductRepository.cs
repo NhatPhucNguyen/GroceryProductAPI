@@ -2,6 +2,7 @@
 using GroceryProductAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace GroceryProductAPI.Services
 {
@@ -41,7 +42,7 @@ namespace GroceryProductAPI.Services
             temp.AddRange(productToDelete.Ingredients);
             if (productToDelete != null)
             {
-                productToDelete.Ingredients.Clear();
+                productToDelete.Ingredients.Clear();                
                 _context.Products.Remove(productToDelete);
                 _context.Ingredients.RemoveRange(temp);
             }
@@ -60,14 +61,17 @@ namespace GroceryProductAPI.Services
             {
                 product.CreatedAt = productToUpdate.CreatedAt;
                 _context.Products.Entry(productToUpdate).CurrentValues.SetValues(product);
-                foreach (var item in product.Ingredients)
+                foreach (var item in productToUpdate.Ingredients.ToList())
                 {
-                    if(item.Name != productToUpdate.Name)
-                    {
-                        productToUpdate.Ingredients.Add(item);
-                    }
+                    item.Products.Clear();
+                    _context.Ingredients.Remove(item);
+                }
+                foreach (var item in product.Ingredients.ToList())
+                {
+                    productToUpdate.Ingredients.Add(item);
                 }
                 productToUpdate.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
             }
         }
     }

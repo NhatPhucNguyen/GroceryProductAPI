@@ -117,7 +117,7 @@ namespace GroceryProductAPI.Controllers
         }
         [Route("{upc}")]
         [HttpPatch]
-        public async Task<ActionResult> UpdatePrice(string upc,[FromBody] JsonPatchDocument<ProductForUpdateDTO> patchProduct)
+        public async Task<ActionResult> PatchProduct(string upc,[FromBody] JsonPatchDocument<ProductForUpdateDTO> patchProduct)
         {
             try
             {
@@ -159,9 +159,9 @@ namespace GroceryProductAPI.Controllers
                 await _repository.DeleteProductAsync(upc);
                 return Ok("Product is successfully deleted");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return StatusCode(500, "Something went wrong in the server");
+                return StatusCode(500, e);
             }
             
         }
