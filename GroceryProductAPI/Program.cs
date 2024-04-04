@@ -22,7 +22,7 @@ builder.Services.AddCors(opt =>
 });
 
 //Connect to databse
-var connectionString = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("Connection2RDS"));
+var connectionString = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("Connection2RDSLocal"));
 var userId = builder.Configuration.GetSection("MySettings").GetSection("Username").Value;
 var password = builder.Configuration.GetSection("MySettings").GetSection("Password").Value;
 connectionString.UserID = userId;
