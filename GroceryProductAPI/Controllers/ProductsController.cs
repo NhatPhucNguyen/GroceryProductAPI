@@ -24,12 +24,18 @@ namespace GroceryProductAPI.Controllers
         }
 
         [HttpGet]        
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string name)
         {
             try
             {
                 var products = await _repository.GetProductsAsync();
+
                 var results = _mapper.Map<IEnumerable<ProductDTO>>(products);
+                if(name.Length > 0)
+                {
+                    return Ok(results.Where(x => x.Name.Contains(name)));
+                }
+
                 return Ok(results);
             }
             catch (Exception)
