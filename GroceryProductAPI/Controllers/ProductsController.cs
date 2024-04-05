@@ -65,6 +65,10 @@ namespace GroceryProductAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> AddProduct([FromBody] ProductForCreationDTO newProduct)
         {
+            if(newProduct.Upc.Length < 4)
+            {
+                return StatusCode(400);
+            }
             try
             {
                 if (await _repository.ProductExistAsync(newProduct.Upc))
