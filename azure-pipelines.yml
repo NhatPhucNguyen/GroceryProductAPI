@@ -3,11 +3,14 @@ variables:
   value: '**\*.sln'
 - name: BuildParameters.ArtifactName
   value: drop
+- name: BuildPlatform
+  value: "any cpu"
+- name: BuildConfiguration
+  value: "release"
 trigger:
   branches:
     include:
     - main
-name: $(date:yyyyMMdd)$(rev:.r)
 resources:
   repositories:
   - repository: self
