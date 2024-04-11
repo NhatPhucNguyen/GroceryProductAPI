@@ -18,7 +18,7 @@ resources:
     ref: refs/heads/main
 jobs:
 - job: Job_1
-  displayName: Agent job 1
+  displayName: Build
   pool:
     name: Default
   steps:
