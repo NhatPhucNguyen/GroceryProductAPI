@@ -127,6 +127,6 @@ stages:
               - task: IISWebAppDeploymentOnMachineGroup@0
                 inputs:
                   WebSiteName: '$(websiteName)'
-                  Package: '$(System.DefaultWorkingDirectory)\**\*.zip'
+                  Package: 'C:\azagent\A2\_work\r1\a\_NhatPhucNguyen.GroceryProductAPI\drop\GroceryProductAPI.zip'
 ...
 
