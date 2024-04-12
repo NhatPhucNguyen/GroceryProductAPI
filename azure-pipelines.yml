@@ -88,7 +88,7 @@ stages:
       - deployment: Dev
         displayName: Dev
         environment: 
-          name: 'Production'    
+          name: 'Dev'    
           resourceType: VirtualMachine
         variables:
         - name: websitePhysicalPath
@@ -128,5 +128,147 @@ stages:
                 inputs:
                   WebSiteName: '$(websiteName)'
                   Package: 'C:\azagent\A2\_work\r1\a\_NhatPhucNguyen.GroceryProductAPI\drop\GroceryProductAPI.zip'
+  - stage: 'Production'
+    displayName: 'Production'
+    dependsOn: 'Build'
+    jobs:
+      - deployment: Production
+        displayName: Production
+        environment: 
+          name: 'Production'    
+          resourceType: VirtualMachine
+        variables:
+        - name: websitePhysicalPath
+          value: '%SystemDrive%\inetpub\wwwroot\$(websiteName)'
+
+        strategy:
+          runOnce:
+            deploy:
+              steps: 
+              - task: IISWebAppManagementOnMachineGroup@0
+                inputs:            
+                  IISDeploymentType: 'IISWebsite'
+                  ActionIISWebsite: 'CreateOrUpdateWebsite'
+                  WebsiteName: '$(websiteName)'
+                  WebsitePhysicalPath: '$(websitePhysicalPath)'
+                  WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
+                  CreateOrUpdateAppPoolForWebsite: true
+                  AppPoolNameForWebsite: '$(appPoolName)'
+                  DotNetVersionForWebsite: 'No Managed Code'
+                  PipeLineModeForWebsite: 'Integrated'
+                  AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
+                  AddBinding: true
+                  Bindings: |
+                      {
+                          bindings:[
+                              {
+                                  "protocol":"http",
+                                  "ipAddress":"",
+                                  "hostname":"",
+                                  "port":"7001",
+                                  "sslThumbprint":"",
+                                  "sniFlag":false
+                              }
+                          ]
+                      }
+              - task: IISWebAppDeploymentOnMachineGroup@0
+                inputs:
+                  WebSiteName: '$(websiteName)'
+                  Package: 'C:\azagent\A2\_work\r1\a\_NhatPhucNguyen.GroceryProductAPI\drop\GroceryProductAPI.zip'
+  - stage: 'QAT'
+    displayName: 'QAT'
+    dependsOn: 'Build'
+    jobs:
+      - deployment: QAT
+        displayName: QAT
+        environment: 
+          name: 'QAT'    
+          resourceType: VirtualMachine
+        variables:
+        - name: websitePhysicalPath
+          value: '%SystemDrive%\inetpub\wwwroot\$(websiteName)'
+
+        strategy:
+          runOnce:
+            deploy:
+              steps: 
+              - task: IISWebAppManagementOnMachineGroup@0
+                inputs:            
+                  IISDeploymentType: 'IISWebsite'
+                  ActionIISWebsite: 'CreateOrUpdateWebsite'
+                  WebsiteName: '$(websiteName)'
+                  WebsitePhysicalPath: '$(websitePhysicalPath)'
+                  WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
+                  CreateOrUpdateAppPoolForWebsite: true
+                  AppPoolNameForWebsite: '$(appPoolName)'
+                  DotNetVersionForWebsite: 'No Managed Code'
+                  PipeLineModeForWebsite: 'Integrated'
+                  AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
+                  AddBinding: true
+                  Bindings: |
+                      {
+                          bindings:[
+                              {
+                                  "protocol":"http",
+                                  "ipAddress":"",
+                                  "hostname":"",
+                                  "port":"7002",
+                                  "sslThumbprint":"",
+                                  "sniFlag":false
+                              }
+                          ]
+                      }
+              - task: IISWebAppDeploymentOnMachineGroup@0
+                inputs:
+                  WebSiteName: '$(websiteName)'
+                  Package: 'C:\azagent\A2\_work\r1\a\_NhatPhucNguyen.GroceryProductAPI\drop\GroceryProductAPI.zip'
+  - stage: 'Stage'
+    displayName: 'Stage'
+    dependsOn: 'Build'
+    jobs:
+      - deployment: Stage
+        displayName: Stage
+        environment: 
+          name: 'Stage'    
+          resourceType: VirtualMachine
+        variables:
+        - name: websitePhysicalPath
+          value: '%SystemDrive%\inetpub\wwwroot\$(websiteName)'
+
+        strategy:
+          runOnce:
+            deploy:
+              steps: 
+              - task: IISWebAppManagementOnMachineGroup@0
+                inputs:            
+                  IISDeploymentType: 'IISWebsite'
+                  ActionIISWebsite: 'CreateOrUpdateWebsite'
+                  WebsiteName: '$(websiteName)'
+                  WebsitePhysicalPath: '$(websitePhysicalPath)'
+                  WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
+                  CreateOrUpdateAppPoolForWebsite: true
+                  AppPoolNameForWebsite: '$(appPoolName)'
+                  DotNetVersionForWebsite: 'No Managed Code'
+                  PipeLineModeForWebsite: 'Integrated'
+                  AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
+                  AddBinding: true
+                  Bindings: |
+                      {
+                          bindings:[
+                              {
+                                  "protocol":"http",
+                                  "ipAddress":"",
+                                  "hostname":"",
+                                  "port":"7003",
+                                  "sslThumbprint":"",
+                                  "sniFlag":false
+                              }
+                          ]
+                      }
+              - task: IISWebAppDeploymentOnMachineGroup@0
+                inputs:
+                  WebSiteName: '$(websiteName)'
+                  Package: 'C:\azagent\A2\_work\r1\a\_NhatPhucNguyen.GroceryProductAPI\drop\GroceryProductAPI.zip'
+
 ...
 
