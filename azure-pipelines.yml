@@ -16,13 +16,13 @@ resources:
   - repository: self
     type: git
     ref: refs/heads/main
+pool:
+  name: Default
 stages:
   - stage: 'Build'
     displayName: 'Build'
     jobs:
     - job: Job_1
-    pool:
-      name: Default
       steps:
       - checkout: self
         clean: true
