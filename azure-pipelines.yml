@@ -7,6 +7,12 @@ variables:
   value: "any cpu"
 - name: BuildConfiguration
   value: "release"
+- name: websiteName
+  value: "groceryApi"
+- name: appPoolName
+  value: "Default"
+- name: projectName
+  value: "GroceryApi"
 trigger:
   branches:
     include:
@@ -75,4 +81,52 @@ stages:
           PathtoPublish: $(build.artifactstagingdirectory)
           ArtifactName: $(BuildParameters.ArtifactName)
           TargetPath: '\\my\share\$(Build.DefinitionName)\$(Build.BuildNumber)'
+  - stage: 'Dev'
+    displayName: 'Dev'
+    dependsOn: 'Build'
+    jobs:
+      - deployment: Dev
+        displayName: Dev
+        environment: 
+          name: 'Dev'    
+          resourceType: VirtualMachine
+        variables:
+        - name: websitePhysicalPath
+          value: '%SystemDrive%\inetpub\wwwroot\$(websiteName)'
+
+        strategy:
+          runOnce:
+            deploy:
+              steps: 
+              - task: IISWebAppManagementOnMachineGroup@0
+                inputs:            
+                  IISDeploymentType: 'IISWebsite'
+                  ActionIISWebsite: 'CreateOrUpdateWebsite'
+                  WebsiteName: '$(websiteName)'
+                  WebsitePhysicalPath: '$(websitePhysicalPath)'
+                  WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
+                  CreateOrUpdateAppPoolForWebsite: true
+                  AppPoolNameForWebsite: '$(appPoolName)'
+                  DotNetVersionForWebsite: 'No Managed Code'
+                  PipeLineModeForWebsite: 'Integrated'
+                  AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
+                  AddBinding: true
+                  Bindings: |
+                      {
+                          bindings:[
+                              {
+                                  "protocol":"http",
+                                  "ipAddress":"",
+                                  "hostname":"",
+                                  "port":"7000",
+                                  "sslThumbprint":"",
+                                  "sniFlag":false
+                              }
+                          ]
+                      }
+              - task: IISWebAppDeploymentOnMachineGroup@0
+                inputs:
+                  WebSiteName: '$(websiteName)'
+                  Package: '$(Pipeline.Workspace)/drop/$(BuildConfiguration)/$(projectName).zip'
 ...
+
