@@ -59,6 +59,7 @@ stages:
         displayName: Run Code Analysis
       - task: SonarQubePublish@4
         displayName: Publish Quality Gate Result
+
       - task: VSTest@2
         displayName: Test Assemblies
         inputs:
@@ -67,6 +68,7 @@ stages:
 
             !**\obj\**
           platform: $(BuildPlatform)
+          codeCoverageEnabled: true
           configuration: $(BuildConfiguration)
       
       - task: PublishSymbols@2
@@ -132,7 +134,7 @@ stages:
                   Package: 'C:\azagent\A2\_work\r1\a\_NhatPhucNguyen.GroceryProductAPI\drop\GroceryProductAPI.zip'
   - stage: 'Production'
     displayName: 'Production'
-    dependsOn: 'Build'
+    dependsOn: 'Dev'
     jobs:
       - deployment: Production
         displayName: Production
@@ -179,7 +181,7 @@ stages:
                   Package: 'C:\azagent\A2\_work\r1\a\_NhatPhucNguyen.GroceryProductAPI\drop\GroceryProductAPI.zip'
   - stage: 'QAT'
     displayName: 'QAT'
-    dependsOn: 'Build'
+    dependsOn: 'Production'
     jobs:
       - deployment: QAT
         displayName: QAT
@@ -226,7 +228,7 @@ stages:
                   Package: 'C:\azagent\A2\_work\r1\a\_NhatPhucNguyen.GroceryProductAPI\drop\GroceryProductAPI.zip'
   - stage: 'Stage'
     displayName: 'Stage'
-    dependsOn: 'Build'
+    dependsOn: 'QAT'
     jobs:
       - deployment: Stage
         displayName: Stage
