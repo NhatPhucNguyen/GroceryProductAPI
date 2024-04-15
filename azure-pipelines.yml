@@ -47,10 +47,7 @@ stages:
           SonarQube: d974f2dc-40eb-488e-996e-dabe4f883bee
           projectKey: GroupProject_GroceryProductAPI_e3c1121f-8214-4778-bf8b-bee5b2fd1862
           projectName: main
-      - task: SonarQubeAnalyze@4
-        displayName: Run Code Analysis
-      - task: SonarQubePublish@4
-        displayName: Publish Quality Gate Result
+
       - task: VSBuild@1
         displayName: Build solution
         inputs:
@@ -58,7 +55,10 @@ stages:
           msbuildArgs: /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactstagingdirectory)\\"
           platform: $(BuildPlatform)
           configuration: $(BuildConfiguration)
-
+      - task: SonarQubeAnalyze@4
+        displayName: Run Code Analysis
+      - task: SonarQubePublish@4
+        displayName: Publish Quality Gate Result
       - task: VSTest@2
         displayName: Test Assemblies
         inputs:
