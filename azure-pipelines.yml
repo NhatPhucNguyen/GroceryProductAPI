@@ -70,7 +70,12 @@ stages:
           platform: $(BuildPlatform)
           codeCoverageEnabled: true
           configuration: $(BuildConfiguration)
-      
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: 'VSTest'
+          testResultsFiles: '**/TEST-*.xml'
+          buildPlatform: 'any cpu'
+          buildConfiguration: 'release'
       - task: PublishSymbols@2
         displayName: Publish symbols path
         continueOnError: True
